@@ -58,7 +58,7 @@ def main():
     # return (ackIds, AmsMessage) tuples from which ackIds and messages
     # payload will be extracted.
     avro_payloads = list()
-    for msg in subscription.pullack(args.nummsgs, retry=5, retrysleep=15, timeout=5):
+    for msg in subscription.pullack(args.nummsgs, retry=5, retrysleep=15, return_immediately=True):
         data = msg.get_data()
         msgid = msg.get_msgid()
         print('msgid={0}'.format(msgid))

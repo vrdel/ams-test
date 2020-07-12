@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import argparse
 import datetime
@@ -64,7 +64,7 @@ def construct_msg(session, bodysize, timezone, schemapath):
         encoder = BinaryEncoder(bytesio)
         avro_writer.write(msg, encoder)
 
-        return bytesio.getvalue().decode('utf-8')
+        return bytesio.getvalue()
 
     statusl = ['OK', 'WARNING', 'MISSING', 'CRITICAL', 'UNKNOWN', 'DOWNTIME']
 

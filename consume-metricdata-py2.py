@@ -67,10 +67,10 @@ def main():
     try:
         schema = load_schema(args.schema)
         if os.path.exists(args.outfile):
-            avroFile = open(args.outfile, 'a+b')
+            avroFile = open(args.outfile, 'a+')
             writer = DataFileWriter(avroFile, DatumWriter())
         else:
-            avroFile = open(args.outfile, 'w+b')
+            avroFile = open(args.outfile, 'w+')
             writer = DataFileWriter(avroFile, DatumWriter(), schema)
 
         for am in avro_payloads:
