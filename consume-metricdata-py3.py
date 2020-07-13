@@ -3,12 +3,10 @@
 from argparse import ArgumentParser
 from argo_ams_library import ArgoMessagingService, AmsException
 
-import avro.schema
 import os
 
 from avro.datafile import DataFileWriter
 from avro.io import DatumWriter
-from io import BytesIO
 
 from pymod.utils import avro_deserialize, load_schema
 
