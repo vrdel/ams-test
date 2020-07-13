@@ -2,30 +2,12 @@
 
 from argparse import ArgumentParser
 from argo_ams_library import ArgoMessagingService, AmsException
+from avro.datafile import DataFileWriter
+from avro.io import DatumWriter
 
-import avro.schema
 import os
 
-from avro.datafile import DataFileWriter
-from avro.io import DatumWriter, BinaryEncoder, BinaryDecoder, DatumReader
-from io import BytesIO
-
-
-def load_schema(schema):
-    try:
-        f = open(schema)
-        schema = avro.schema.parse(f.read())
-        return schema
-    except Exception as e:
-        raise e
-
-
-def avro_deserialize(msg, schema):
-    opened_schema = load_schema(schema)
-    avro_reader = DatumReader(opened_schema)
-    bytesio = BytesIO(msg)
-    decoder = BinaryDecoder(bytesio)
-    return avro_reader.read(decoder)
+from pymod.utils import avro_deserialize, load_schema
 
 
 def main():

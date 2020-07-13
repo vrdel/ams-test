@@ -3,69 +3,23 @@
 import argparse
 import datetime
 import messaging.generator as generator
-import os
-import pwd
 import random
 import sys
 import time
 
 from messaging.message import Message
 from messaging.error import MessageError
-from messaging.queue.dqs import DQS
 
 from argo_ams_library.ams import ArgoMessagingService
 from argo_ams_library.amsmsg import AmsMessage
 from argo_ams_library.amsexceptions import AmsConnectionException, AmsServiceException
 
-import avro.schema
-from avro.datafile import DataFileWriter
-from avro.io import DatumWriter, BinaryEncoder, BinaryDecoder, DatumReader
-from io import BytesIO
-
 from pytz import timezone, UnknownTimeZoneError
+
+from pymod.utils import avro_serialize, body2dict, tag2dict
 
 
 def construct_msg(session, bodysize, timezone, schemapath):
-    def _body2dict(body):
-        body_fields = ['summary', 'message', 'actual_data']
-        return _extract_body(body, body_fields)
-
-    def _extract_body(body, fields, maps=None):
-        msg = dict()
-
-        bodylines = body.split('\n')
-        for line in bodylines:
-            split = line.split(': ', 1)
-            if len(split) > 1:
-                key = split[0]
-                value = split[1]
-
-                if key not in set(fields):
-                    continue
-
-                if maps and key in maps:
-                    key = maps[key]
-
-                msg[key] = value
-
-        return msg
-
-    def _tag2dict(body):
-        tag_fields = ['vofqan', 'voname', 'roc', 'site']
-
-        body_to_tagname = dict(site='endpoint_group')
-
-        return _extract_body(body, tag_fields, body_to_tagname)
-
-    def _avro_serialize(msg, schemapath):
-        schema = open(schemapath)
-        avro_writer = DatumWriter(avro.schema.parse(schema.read()))
-        bytesio = BytesIO()
-        encoder = BinaryEncoder(bytesio)
-        avro_writer.write(msg, encoder)
-
-        return bytesio.getvalue().decode('utf-8')
-
     statusl = ['OK', 'WARNING', 'MISSING', 'CRITICAL', 'UNKNOWN', 'DOWNTIME']
 
     try:
@@ -91,10 +45,10 @@ def construct_msg(session, bodysize, timezone, schemapath):
 
         plainmsg = dict()
         plainmsg.update(msg.header)
-        plainmsg.update(_body2dict(msg.body))
-        plainmsg.update(tags=_tag2dict(msg.body))
+        plainmsg.update(body2dict(msg.body))
+        plainmsg.update(tags=tag2dict(msg.body))
 
-        return _avro_serialize(plainmsg, schemapath)
+        return avro_serialize(plainmsg, schemapath)
 
     except MessageError as e:
         sys.stderr.write('Error constructing message - %s\n', repr(e))
