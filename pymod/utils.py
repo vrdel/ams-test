@@ -55,21 +55,12 @@ def avro_serialize(msg, schemapath):
     bytesio = BytesIO()
     encoder = BinaryEncoder(bytesio)
     avro_writer.write(msg, encoder)
-
-    if sys.version_info < (3, ):
-        return bytesio.getvalue()
-    else:
-        return bytesio.getvalue().decode('utf-8')
+    return bytesio.getvalue()
 
 
 def avro_deserialize(msg, schema):
     opened_schema = load_schema(schema)
     avro_reader = DatumReader(opened_schema)
-
-    if sys.version_info < (3, ):
-        bytesio = BytesIO(msg)
-    else:
-        bytesio = BytesIO(msg.encode('utf-8'))
-
+    bytesio = BytesIO(msg)
     decoder = BinaryDecoder(bytesio)
     return avro_reader.read(decoder)
