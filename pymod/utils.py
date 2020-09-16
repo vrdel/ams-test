@@ -58,9 +58,17 @@ def avro_serialize(msg, schemapath):
     return bytesio.getvalue()
 
 
-def avro_deserialize(msg, schema):
+def avro_deserialize(msg, schema, bulk=False):
     opened_schema = load_schema(schema)
     avro_reader = DatumReader(opened_schema)
     bytesio = BytesIO(msg)
     decoder = BinaryDecoder(bytesio)
-    return avro_reader.read(decoder)
+    if bulk:
+        data = []
+        try:
+            while True:
+                data.append(avro_reader.read(decoder))
+        except AssertionError:
+            return data
+    else:
+        return avro_reader.read(decoder)
