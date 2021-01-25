@@ -7,5 +7,5 @@ docker run \
 -v $HOME:/mnt/ \
 -v $HOME/.ssh:/home/user/.ssh/ \
 -h docker-centos7 \
--v $HOME/my_work/srce/git.ams-test/ams-test/:/home/user/bin/ \
+-v $HOME/my_work/srce/git.ams-test/ams-test/:/home/user/ams-test-source/ \
 --rm -ti -v /dev/log:/dev/log ipanema:5000/ams-broker-test
